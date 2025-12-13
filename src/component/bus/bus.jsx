@@ -1,23 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import simrikBus from "../../assets/simrik.png";
-import jeepImg from "../../assets/jeep.png";
-import hiaceImg from "../../assets/hiace.png";
 
-// BUS interiors
 import busSeatStandard from "../../assets/seat.webp";
 import busSeatDeluxe from "../../assets/busSeat.jpeg";
 import busSeatSleeper from "../../assets/busSeat1.jpeg";
 
-// JEEP interiors
-import jeepSeat1 from "../../assets/jeepSeat.jpg";
-import jeepSeat2 from "../../assets/jeepSeat2.jpg";
-
-// HIACE interiors
-import hiaceSeat1 from "../../assets/HiaceSeat.jpg";
-import hiaceSeat2 from "../../assets/HiaceSeat2.webp";
-import hiaceSeat3 from "../../assets/HSeat.jpeg";
-
-/*  VEHICLES  */
 const vehicles = [
   {
     id: "deluxe",
@@ -65,192 +52,106 @@ const vehicles = [
     droppingPoints: ["Kakarvitta (06:00 AM)"],
   },
   
-  /*  JEEPS  */
-  {
-    id: "jeep-sharing",
-    type: "jeep",
-    timeOfDay: "day",
-    image: jeepImg,
-    name: "Simrik Shared Jeep",
-    departure: "6:00 AM",
-    arrival: "1:30 PM",
-    price: 900,
-    features: ["Non A/C", "Music", "Charging Port"],
-    amenities: ["Bottle of Water", "Comfortable Seats"],
-    gallery: [jeepSeat1, jeepSeat2],
-    boardingPoints: ["Koteshwor (05:30 AM)", "Jadibuti (05:45 AM)"],
-    droppingPoints: ["Kakarvitta (01:30 PM)"],
-  },
-  {
-    id: "jeep-private",
-    type: "jeep",
-    timeOfDay: "day",
-    image: jeepImg,
-    name: "Simrik Private Jeep",
-    departure: "8:00 AM",
-    arrival: "3:00 PM",
-    price: 4500,
-    features: ["A/C", "Private Hire"],
-    amenities: ["Flexible Stops", "Spacious Luggage"],
-    gallery: [jeepSeat2, jeepSeat1],
-    boardingPoints: ["Thamel (07:30 AM)", "Koteshwor (07:50 AM)"],
-    droppingPoints: ["Kakarvitta (03:00 PM)"],
-  },
-  /*  HIACE  */
-  {
-    id: "hiace-morning",
-    type: "hiace",
-    timeOfDay: "day",
-    image: hiaceImg,
-    name: "Simrik Hiace Morning",
-    departure: "5:30 AM",
-    arrival: "1:00 PM",
-    price: 1000,
-    features: ["A/C", "Wi-Fi"],
-    amenities: ["Water Bottle", "Reclining Seats"],
-    gallery: [hiaceSeat1, hiaceSeat2, hiaceSeat3],
-    boardingPoints: ["Balaju (05:00 AM)", "Sorhakhutte (05:10 AM)"],
-    droppingPoints: ["Kakarvitta (01:00 PM)"],
-  },
-  {
-    id: "hiace-ev",
-    type: "hiace",
-    timeOfDay: "day",
-    image: hiaceImg,
-    name: "Simrik Hiace Electric (EV)",
-    departure: "8:00 AM",
-    arrival: "3:00 PM",
-    price: 1200,
-    features: ["Electric EV", "Silent Cabin", "A/C", "Wi-Fi", "USB Charging Ports"],
-    amenities: ["Water Bottle", "Comfort Reclining Seats", "Eco-Friendly Ride"],
-    gallery: [hiaceSeat1, hiaceSeat2],
-    boardingPoints: ["Balaju (07:40 AM)", "Sorhakhutte (07:50 AM)"],
-    droppingPoints: ["Kakarvitta (03:00 PM)"],
-  },
-  {
-    id: "hiace-night",
-    type: "hiace",
-    timeOfDay: "night",
-    image: hiaceImg,
-    name: "Simrik Hiace Night",
-    departure: "8:30 PM",
-    arrival: "5:00 AM",
-    price: 950,
-    features: ["Non A/C", "Music System"],
-    amenities: ["Blanket", "Neck Pillow"],
-    gallery: [hiaceSeat3, hiaceSeat2, hiaceSeat1],
-    boardingPoints: ["Koteshwor (08:00 PM)", "Gwarko (08:15 PM)"],
-    droppingPoints: ["Kakarvitta (05:00 AM)"],
-  },
 ];
 
-/*  SEAT LAYOUT HELPERS  */
-const createLayout = (rows, cols, options = {}) => {
-  const { occupiedIds = [], womenIds = [], allowedIds = null } = options;
-  const occupiedSet = new Set(occupiedIds);
-  const womenSet = new Set(womenIds);
-  const allowedSet = allowedIds ? new Set(allowedIds) : null;
-
-  const seats = [];
-  for (let r = 1; r <= rows; r++) {
-    for (const c of cols) {
-      const id = `${r}${c}`;
-      if (allowedSet && !allowedSet.has(id)) continue;
-
-      seats.push({
-        id,
-        status: occupiedSet.has(id) ? "occupied" : "available",
-        type: womenSet.has(id) ? "women" : "normal",
-      });
-    }
-  }
-  return { rows, cols, seats };
-};
-
-/*  LAYOUTS PER VEHICLE TYPE  */
-const seatLayouts = {
-  bus: createLayout(10, ["A", "B", "C", "D"], {
-    occupiedIds: ["1B", "2A", "2D", "4B", "4C", "5D", "6A", "7B", "9A"],
-    womenIds: ["3C", "5A", "7C", "8D"],
-  }),
-  jeep: createLayout(3, ["A", "B", "C", "D"], {
-    allowedIds: ["1A", "2A", "2B", "2C", "2D", "3A", "3B", "3C", "3D"],
-    occupiedIds: ["2B", "3C"],
-    womenIds: ["2A", "3D"],
-  }),
-  hiace: createLayout(5, ["A", "B", "C", "D", "E"], {
-    allowedIds: [
-      "1A",
-      "2A",
-      "2B",
-      "2C",
-      "3A",
-      "3B",
-      "3D",
-      "4A",
-      "4B",
-      "4D",
-      "5A",
-      "5B",
-      "5C",
-      "5D",
-      "5E",
-    ],
-    occupiedIds: ["2C", "3D", "4B"],
-    womenIds: ["1A", "3B", "5C"],
-  }),
-};
-
-/*  MAIN COMPONENT  */
-const BusBookingApp = () => {
-  const [selectedBus, setSelectedBus] = useState(null);
-  const [selectedSeats, setSelectedSeats] = useState([]);
+const Bus = () => {
   const [expandedBusId, setExpandedBusId] = useState(vehicles[0].id);
   const [expandedTab, setExpandedTab] = useState("amenities");
   const [expandedImage, setExpandedImage] = useState(null);
 
   // filters
-  const [vehicleTypeFilter, setVehicleTypeFilter] = useState("all"); // bus / jeep / hiace
-  const [priceFilter, setPriceFilter] = useState("any"); // any / under1000 / 1000-1500 / above1500
+  const [priceFilter, setPriceFilter] = useState("any"); 
   const [featureFilters, setFeatureFilters] = useState({
     ac: false,
     wifi: false,
     electric: false,
   });
-  const [timeFilter, setTimeFilter] = useState("both"); // both / day / night
+  const [timeFilter, setTimeFilter] = useState("both"); 
 
-  const seatPrice = selectedBus ? selectedBus.price : 0;
-  const totalPrice = selectedSeats.length * seatPrice;
+  // BOOKING MODAL STATE
+  const [bookingBus, setBookingBus] = useState(null);
+  const [showBooking, setShowBooking] = useState(false);
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    days: "",
+    pickupDate: "",
+    pickupLocation: "",
+    specialRequests: "",
+  });
+
+  const clearForm = () =>
+    setForm({
+      fullName: "",
+      email: "",
+      phone: "",
+      days: "",
+      pickupDate: "",
+      pickupLocation: "",
+      specialRequests: "",
+    });
+
+  const openBooking = (bus) => {
+    setBookingBus(bus);
+    setShowBooking(true);
+  };
+
+  const closeBooking = () => {
+    setShowBooking(false);
+    setBookingBus(null);
+    clearForm();
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!bookingBus) return;
+
+    const daysNumber = Number(form.days) > 0 ? Number(form.days) : 1;
+    const total = bookingBus.price * daysNumber;
+
+    alert(
+      `Booking confirmed!\n\n` +
+        `Bus: ${bookingBus.name}\n` +
+        `Name: ${form.fullName}\n` +
+        `Email: ${form.email}\n` +
+        `Phone: ${form.phone}\n` +
+        `Days: ${daysNumber}\n` +
+        `Pickup: ${form.pickupDate || "N/A"} from ${
+          form.pickupLocation || "N/A"
+        }\n\n` +
+        `Total: Rs. ${total}`
+    );
+
+    closeBooking();
+  };
 
   const toggleFeature = (key) => {
     setFeatureFilters((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const clearAllFilters = () => {
-    setVehicleTypeFilter("all");
     setPriceFilter("any");
     setFeatureFilters({ ac: false, wifi: false, electric: false });
     setTimeFilter("both");
   };
 
   const filteredVehicles = vehicles.filter((v) => {
-    // vehicle type
-    if (vehicleTypeFilter !== "all" && v.type !== vehicleTypeFilter) {
-      return false;
-    }
+    // time of day filter
+    if (timeFilter !== "both" && v.timeOfDay !== timeFilter) return false;
 
-    // time of day
-    if (timeFilter !== "both" && v.timeOfDay !== timeFilter) {
-      return false;
-    }
-
-    // price
+    // price filter
     if (priceFilter === "under1000" && v.price >= 1000) return false;
     if (priceFilter === "1000-1500" && (v.price < 1000 || v.price > 1500))
       return false;
     if (priceFilter === "above1500" && v.price <= 1500) return false;
 
-    // features
+    // feature filters
     if (featureFilters.ac && !v.features.some((f) => f.includes("A/C")))
       return false;
     if (featureFilters.wifi && !v.features.some((f) => f.includes("Wi-Fi")))
@@ -264,51 +165,17 @@ const BusBookingApp = () => {
     return true;
   });
 
-  const handleToggleSeat = (seat) => {
-    if (seat.status === "occupied") return;
-    setSelectedSeats((prev) =>
-      prev.includes(seat.id)
-        ? prev.filter((s) => s !== seat.id)
-        : [...prev, seat.id]
-    );
-  };
-
-  const handleSelectBus = (bus) => {
-    // toggle open/close for same bus
-    if (selectedBus && selectedBus.id === bus.id) {
-      setSelectedBus(null);
-      setSelectedSeats([]);
-      return;
-    }
-    setSelectedBus(bus);
-    setSelectedSeats([]);
-  };
-
-  const closeSeatPanel = () => {
-    setSelectedBus(null);
-    setSelectedSeats([]);
-  };
-
-  const handleConfirmSelection = () => {
-    if (!selectedSeats.length) {
-      alert("Please select at least one seat.");
-      return;
-    }
-    const seatsList = selectedSeats.join(", ");
-    alert(`You have selected seats: ${seatsList}. Total: Rs. ${totalPrice}`);
-    closeSeatPanel();
-  };
-
   return (
     <div className='max-w-full min-h-screen bg-[#ffffffd7] text-[#0f172a] font-[system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif]'>
       <div className="max-w-full min-h-screen bg-[rgba(255,255,255,0.4)] backdrop-blur-sm px-3 py-6 sm:px-4 md:px-8 lg:px-12">
-        {/* PAGE TITLE */}
+        {/* TITLE */}
         <div className="max-w-5xl mx-auto mb-5">
           <h1 className="text-center text-xl sm:text-2xl font-semibold text-[#0f172a]">
+            Bus Tickets
           </h1>
         </div>
 
-        {/* MAIN LAYOUT: filters + results */}
+        {/* LAYOUT: FILTERS + RESULTS */}
         <div className="max-w-6xl mx-auto flex flex-col lg:flex-row items-start gap-4 md:gap-6">
           {/* FILTERS */}
           <aside className="w-full lg:w-64 xl:w-72 self-start bg-white rounded-3xl shadow-[0_18px_40px_rgba(15,23,42,0.12)] p-4 sm:p-5 mb-4 lg:mb-0">
@@ -324,32 +191,8 @@ const BusBookingApp = () => {
               </button>
             </div>
 
-            {/* Vehicle type */}
+            {/* TIME OF DAY */}
             <div className="border-t border-[#e5e7eb] pt-3 mt-2">
-              <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b7280] mb-1">
-                Vehicle Type
-              </p>
-              <div className="space-y-1 text-[13px] text-[#111827]">
-                {["all", "bus", "jeep", "hiace"].map((t) => (
-                  <label key={t} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="vehicleType"
-                      className="accent-[#059669]"
-                      value={t}
-                      checked={vehicleTypeFilter === t}
-                      onChange={() => setVehicleTypeFilter(t)}
-                    />
-                    <span className="capitalize">
-                      {t === "all" ? "All" : t}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Time of day */}
-            <div className="border-t border-[#e5e7eb] pt-3 mt-3">
               <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b7280] mb-1">
                 Time of Day
               </p>
@@ -390,7 +233,7 @@ const BusBookingApp = () => {
               </div>
             </div>
 
-            {/* Price */}
+            {/* PRICE */}
             <div className="border-t border-[#e5e7eb] pt-3 mt-3">
               <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b7280] mb-1">
                 Price (per person)
@@ -443,7 +286,7 @@ const BusBookingApp = () => {
               </div>
             </div>
 
-            {/* Features */}
+            {/* FEATURES */}
             <div className="border-t border-[#e5e7eb] pt-3 mt-3">
               <p className="text-[11px] uppercase tracking-[0.16em] text-[#6b7280] mb-1">
                 Features
@@ -480,7 +323,7 @@ const BusBookingApp = () => {
             </div>
           </aside>
 
-          {/* RESULTS */}
+          {/* RESULTS – RIGHT */}
           <main className="flex-1 flex justify-center items-start">
             <section
               className="w-full max-w-3xl xl:max-w-[960px] bg-white rounded-3xl
@@ -490,9 +333,10 @@ const BusBookingApp = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <div>
                   <h2 className="m-0 text-[18px] sm:text-[20px] font-bold text-[#0f172a]">
+                    Available Buses
                   </h2>
                   <p className="mt-1 mb-0 text-[12px] sm:text-[13px] text-[#6b7280]">
-                    Choose a vehicle and then pick your preferred seats.
+                    Choose a bus and then book your seats.
                   </p>
                 </div>
                 <span
@@ -501,7 +345,7 @@ const BusBookingApp = () => {
                              bg-[#ecfdf5] text-[#047857] self-start sm:self-auto"
                 >
                   <span className="w-2 h-2 rounded-full bg-[#22c55e]" />
-                  {filteredVehicles.length} vehicles found
+                  {filteredVehicles.length} buses found
                 </span>
               </div>
 
@@ -516,9 +360,9 @@ const BusBookingApp = () => {
                                hover:border-[#bae6fd]
                                hover:-translate-y-0.5 bg-white"
                   >
-                    {/* top row */}
+                    {/* TOP ROW */}
                     <div className="flex flex-col md:flex-row justify-between gap-4">
-                      {/* LEFT SIDE: IMAGE + INFO */}
+                      {/* IMAGE + INFO */}
                       <div className="flex flex-1 items-center gap-3 sm:gap-4 min-w-[240px]">
                         <div
                           className="w-[140px] h-[100px] sm:w-[170px] sm:h-[120px] rounded-[14px]
@@ -572,8 +416,8 @@ const BusBookingApp = () => {
                         </div>
                       </div>
 
-                      {/* RIGHT SIDE: PRICE + BUTTON */}
-                      <div className="flex flex-row md:flex-col items-end md:items-end justify-between gap-2 min-w-[120px]">
+                      {/* PRICE + BUTTON */}
+                      <div className="flex flex-row md:flex-col items-end justify-between gap-2 min-w-[120px]">
                         <div className="text-right">
                           <div className="text-[16px] sm:text-[18px] font-bold text-[#047857] tracking-[0.4px]">
                             Rs. {bus.price}
@@ -583,6 +427,7 @@ const BusBookingApp = () => {
                           </div>
                         </div>
                         <button
+                          type="button"
                           className="border-none rounded-full px-[14px] sm:px-[18px] py-2
                                      text-[12px] sm:text-[13px] font-semibold cursor-pointer
                                      bg-[#00bfa5] text-white
@@ -591,26 +436,21 @@ const BusBookingApp = () => {
                                      hover:bg-[#009f8a]
                                      hover:-translate-y-px
                                      hover:shadow-[0_14px_30px_rgba(0,191,165,0.45)]"
-                          onClick={() => handleSelectBus(bus)}
+                          onClick={() => openBooking(bus)}
                         >
-                          {selectedBus && selectedBus.id === bus.id
-                            ? "Hide Seats"
-                            : "Select Seats"}
+                          Book Now
                         </button>
                       </div>
                     </div>
 
-                    {/* Tabs */}
+                    {/* TABS */}
                     <div
                       className="mt-3 pt-2.5 border-t border-[#e5e7eb]
                                  flex flex-wrap gap-2.5 text-[12px]"
                     >
                       {[
                         { key: "amenities", label: "Amenities" },
-                        {
-                          key: "boarding",
-                          label: "Boarding & Dropping Point",
-                        },
+                        { key: "boarding", label: "Boarding & Dropping Point" },
                         { key: "gallery", label: "Gallery" },
                       ].map((tab) => {
                         const active =
@@ -637,7 +477,7 @@ const BusBookingApp = () => {
                       })}
                     </div>
 
-                    {/* Tab Content */}
+                    {/* TAB CONTENT */}
                     {expandedBusId === bus.id && (
                       <div
                         key={expandedTab}
@@ -668,10 +508,7 @@ const BusBookingApp = () => {
                               </h4>
                               <ul className="m-0 pl-[18px] tracking-[0.25px] list-disc">
                                 {bus.boardingPoints.map((bp) => (
-                                  <li
-                                    key={bp}
-                                    className="mb-1 text-[#475569]"
-                                  >
+                                  <li key={bp} className="mb-1 text-[#475569]">
                                     {bp}
                                   </li>
                                 ))}
@@ -683,10 +520,7 @@ const BusBookingApp = () => {
                               </h4>
                               <ul className="m-0 pl-[18px] tracking-[0.25px] list-disc">
                                 {bus.droppingPoints.map((dp) => (
-                                  <li
-                                    key={dp}
-                                    className="mb-1 text-[#475569]"
-                                  >
+                                  <li key={dp} className="mb-1 text-[#475569]">
                                     {dp}
                                   </li>
                                 ))}
@@ -743,200 +577,12 @@ const BusBookingApp = () => {
                           ))}
                       </div>
                     )}
-
-                    {/* INLINE SEAT LAYOUT – appears directly under this card */}
-                    {selectedBus && selectedBus.id === bus.id && (
-                      <div className="mt-4 border border-[#e5e7eb] rounded-2xl bg-white shadow-sm">
-                        <header className="px-4 py-3.5 border-b border-[#e5e7eb] flex justify-between items-center gap-3">
-                          <div>
-                            <h3 className="m-0 text-[15px] sm:text-[16px] font-bold">
-                              Select Seats – {selectedBus.name}
-                            </h3>
-                            <p className="m-0 mt-1 text-[11px] sm:text-[12px] text-[#6b7280]">
-                              Click on available seats to select them.
-                            </p>
-                          </div>
-                          <button
-                            className="border-none bg-[#f3f4f6] w-[28px] h-[28px]
-                                       rounded-full text-[16px] leading-none
-                                       cursor-pointer flex items-center justify-center
-                                       text-[#4b5563] hover:bg-[#e5e7eb]"
-                            onClick={closeSeatPanel}
-                          >
-                            ×
-                          </button>
-                        </header>
-
-                        <div className="px-4 pt-3.5 pb-2 overflow-x-auto">
-                          {/* driver */}
-                          <div className="flex justify-end mb-2.5">
-                            <div
-                              className="inline-flex items-center justify-center
-                                         px-2.5 py-1 rounded-full
-                                         bg-[#f3f4f6] text-[11px] text-[#4b5563]"
-                            >
-                              Driver
-                            </div>
-                          </div>
-
-                          <div className="bg-[#f9fafb] rounded-[18px] px-3 sm:px-4 pt-3.5 pb-4">
-                            {(() => {
-                              const layout =
-                                seatLayouts[selectedBus.type] ||
-                                seatLayouts.bus;
-                              const { rows, cols, seats } = layout;
-
-                              return (
-                                <div className="flex flex-col gap-2.5 items-center">
-                                  {Array.from({ length: rows }, (_, rowIndex) => {
-                                    const rowNum = rowIndex + 1;
-                                    const leftCols = cols.slice(
-                                      0,
-                                      Math.ceil(cols.length / 2)
-                                    );
-                                    const rightCols = cols.slice(
-                                      Math.ceil(cols.length / 2)
-                                    );
-
-                                    const makeSeat = (letter) =>
-                                      seats.find(
-                                        (s) => s.id === `${rowNum}${letter}`
-                                      );
-
-                                    const sides = [
-                                      leftCols.map(makeSeat),
-                                      rightCols.map(makeSeat),
-                                    ];
-
-                                    return (
-                                      <div
-                                        className="flex gap-4 sm:gap-8"
-                                        key={rowNum}
-                                      >
-                                        {sides.map((pair, sideIndex) => (
-                                          <div className="flex" key={sideIndex}>
-                                            {pair.map(
-                                              (seat) =>
-                                                seat && (
-                                                  <button
-                                                    key={seat.id}
-                                                    className={`relative w-9 h-9 sm:w-10 sm:h-10 rounded-lg
-                                                                border text-[11px] sm:text-[12px] font-semibold
-                                                                inline-flex items-center justify-center
-                                                                mr-1
-                                                                ${
-                                                                  seat.status ===
-                                                                  "occupied"
-                                                                    ? "bg-[#fb7185] border-[#fb7185] text-white cursor-not-allowed"
-                                                                    : selectedSeats.includes(
-                                                                        seat.id
-                                                                      )
-                                                                    ? "bg-[#059669] border-[#059669] text-white"
-                                                                    : "bg-[#f3f4f6] border-[#e5e7eb] hover:bg-[#d1fae5] hover:border-[#34d399]"
-                                                                }`}
-                                                    onClick={() =>
-                                                      handleToggleSeat(seat)
-                                                    }
-                                                    disabled={
-                                                      seat.status === "occupied"
-                                                    }
-                                                  >
-                                                    <span className="pointer-events-none">
-                                                      {seat.id}
-                                                    </span>
-                                                    {seat.type === "women" && (
-                                                      <span
-                                                        className={`absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full
-                                                                    flex items-center justify-center
-                                                                    text-[9px] font-bold leading-none
-                                                                    ${
-                                                                      seat.status ===
-                                                                      "occupied"
-                                                                        ? "bg-[#fee2e2] text-[#b91c1c]"
-                                                                        : selectedSeats.includes(
-                                                                            seat.id
-                                                                          )
-                                                                        ? "bg-white text-[#059669]"
-                                                                        : "bg-[#ec4899] text-white"
-                                                                    }`}
-                                                      >
-                                                        W
-                                                      </span>
-                                                    )}
-                                                  </button>
-                                                )
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    );
-                                  })}
-
-                                  <div className="flex flex-wrap justify-center gap-3 mt-3.5 text-[10px] sm:text-[11px] text-[#4b5563]">
-                                    <div className="flex items-center gap-1.5">
-                                      <span
-                                        className="w-4 h-4 rounded-full
-                                                   bg-[#e5e7eb] border border-[#d1d5db]"
-                                      />
-                                      <span>Available</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                      <span className="w-4 h-4 rounded-full bg-[#fb7185]" />
-                                      <span>Occupied</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                      <span className="w-4 h-4 rounded-full bg-[#059669]" />
-                                      <span>Selected</span>
-                                    </div>
-                                    <div className="flex items-center gap-1.5">
-                                      <span
-                                        className="w-4 h-4 rounded-full bg-[#ec4899]
-                                                   text-white flex items-center justify-center
-                                                   text-[10px] font-bold"
-                                      >
-                                        W
-                                      </span>
-                                      <span>Women seat</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
-
-                        <footer className="px-4 py-3.5 border-t border-[#e5e7eb] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-[12px] sm:text-[13px]">
-                          <div className="flex flex-col gap-0.5">
-                            <div>
-                              Selected Seats:{" "}
-                              <strong>{selectedSeats.length}</strong>
-                            </div>
-                            <div>
-                              Total: <strong>Rs. {totalPrice}</strong>
-                            </div>
-                          </div>
-                          <button
-                            className="border-none rounded-full px-[16px] sm:px-[18px] py-2
-                                       text-[12px] sm:text-[13px] font-semibold cursor-pointer
-                                       bg-[#00bfa5] text-white
-                                       shadow-[0_10px_25px_rgba(0,191,165,0.4)]
-                                       transition-all duration-200
-                                       hover:bg-[#009f8a]
-                                       hover:-translate-y-px
-                                       hover:shadow-[0_14px_30px_rgba(0,191,165,0.45)] self-stretch sm:self-auto"
-                            onClick={handleConfirmSelection}
-                          >
-                            Confirm Selection
-                          </button>
-                        </footer>
-                      </div>
-                    )}
                   </article>
                 ))}
 
                 {!filteredVehicles.length && (
                   <div className="text-center text-sm text-[#6b7280] py-10">
-                    No vehicles match your filters. Try changing your options.
+                    No buses match your filters. Try changing your options.
                   </div>
                 )}
               </div>
@@ -944,8 +590,151 @@ const BusBookingApp = () => {
           </main>
         </div>
       </div>
+
+      {/* BOOKING MODAL */}
+      {showBooking && bookingBus && (
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-[rgba(15,23,42,0.55)] px-3">
+          <div className="w-full max-w-3xl bg-white rounded-3xl shadow-[0_24px_70px_rgba(15,23,42,0.4)] p-5 sm:p-7 relative">
+            <button
+              type="button"
+              className="absolute right-4 top-4 text-xl leading-none text-[#9ca3af] hover:text-[#4b5563]"
+              onClick={closeBooking}
+            >
+              ×
+            </button>
+
+            <h2 className="text-xl sm:text-2xl font-semibold text-[#0f172a] mb-1">
+              Book {bookingBus.name}
+            </h2>
+            <p className="text-[13px] text-[#6b7280] mb-4">
+              Fill in the details to book your vehicle.
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[12px] text-[#6b7280] mb-1">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={form.fullName}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12px] text-[#6b7280] mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12px] text-[#6b7280] mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12px] text-[#6b7280] mb-1">
+                    Number of Days
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    name="days"
+                    value={form.days}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12px] text-[#6b7280] mb-1">
+                    Pickup Date
+                  </label>
+                  <input
+                    type="date"
+                    name="pickupDate"
+                    value={form.pickupDate}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[12px] text-[#6b7280] mb-1">
+                    Pickup Location
+                  </label>
+                  <input
+                    type="text"
+                    name="pickupLocation"
+                    value={form.pickupLocation}
+                    onChange={handleChange}
+                    required
+                    className="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#3b82f6]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[12px] text-[#6b7280] mb-1">
+                  Special Requests
+                </label>
+                <textarea
+                  name="specialRequests"
+                  rows={3}
+                  value={form.specialRequests}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border border-[#e5e7eb] px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[#3b82f6] resize-none"
+                />
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-2 text-sm">
+                <div className="text-[#374151]">
+                  <div>
+                    Vehicle: <strong>{bookingBus.name}</strong>
+                  </div>
+                  <div>
+                    Price per person: <strong>Rs. {bookingBus.price}</strong>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full sm:w-auto border-none rounded-full px-6 py-2.5
+                             text-[13px] font-semibold cursor-pointer
+                             bg-[#00bfa5] text-white
+                             shadow-[0_10px_25px_rgba(0,191,165,0.4)]
+                             hover:bg-[#009f8a]
+                             hover:-translate-y-px
+                             hover:shadow-[0_14px_30px_rgba(0,191,165,0.45)]
+                             transition-all duration-200"
+                >
+                  Confirm Booking
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default BusBookingApp;
+export default Bus;
